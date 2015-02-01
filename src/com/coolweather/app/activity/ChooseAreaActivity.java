@@ -160,7 +160,7 @@ public class ChooseAreaActivity extends Activity {
         if (!TextUtils.isEmpty(code)) {
             address = "http://www.weather.com.cn/data/list3/city" + code + ".xml";
         } else {
-            address = "http://www.weather.com.cn/data/list3/city.xml";
+            address = "http://192.168.2.104:5000/interface/province";
         }
         showProgressDialog();
         HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {

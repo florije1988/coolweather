@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
 
 /**
@@ -23,21 +24,37 @@ public class Utility {
      * 解析和处理服务器返回的省级数据
      */
     public synchronized static boolean handleProvincesResponse(CoolWeatherDB coolWeatherDB, String response) {
-        if (!TextUtils.isEmpty(response)) {
-            String[] allProvinces = response.split(",");
-            if (allProvinces.length > 0) {
-                for (String p : allProvinces) {
-                    String[] array = p.split("\\|");
-                    Province province = new Province();
-                    province.setProvinceCode(array[0]);
-                    province.setProvinceName(array[1]);
-                    // 将解析出来的数据存储到Province表
-                    coolWeatherDB.saveProvince(province);
-                }
-                return true;
+//        if (!TextUtils.isEmpty(response)) {
+//            String[] allProvinces = response.split(",");
+//            if (allProvinces.length > 0) {
+//                for (String p : allProvinces) {
+//                    String[] array = p.split("\\|");
+//                    Province province = new Province();
+//                    province.setProvinceCode(array[0]);
+//                    province.setProvinceName(array[1]);
+//                    // 将解析出来的数据存储到Province表
+//                    coolWeatherDB.saveProvince(province);
+//                }
+//                return true;
+//            }
+//        }
+//        return false;
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONObject allProvinces = jsonObject.getJSONObject("data");
+            Iterator<?> it = allProvinces.keys();
+            while(it.hasNext()){
+                Province province = new Province();
+                String provinceCode = it.next().toString();
+                province.setProvinceCode(provinceCode);
+                province.setProvinceName(allProvinces.getString(provinceCode));
+                coolWeatherDB.saveProvince(province);
             }
+            return true;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     /**
